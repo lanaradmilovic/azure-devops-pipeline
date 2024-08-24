@@ -1,9 +1,9 @@
----
 - name: Deploy Docker Container
-  hosts: devgit
+  hosts: dev
   become: true
   vars:
-    docker_image: "lanaradmilovic/taskservice:{{ docker_image }}"
+    tag: "{{ docker_image_tag }}"
+    docker_image: "lanaradmilovic/taskservice:{{ tag }}"
     container_name: "task-service-container"
 
   tasks:
@@ -22,7 +22,7 @@
     - name: Pull Docker image
       docker_image:
         name: "{{ docker_image }}"
-        tag: latest
+        tag: "{{ tag }}"
         state: present
 
     - name: Run Docker container
