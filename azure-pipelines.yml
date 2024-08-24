@@ -70,5 +70,6 @@ stages:
     steps:
     - script: |
         pip install ansible
-        ansible-playbook -i ansible/ansible_hosts ansible/01-playbook.yml --extra-vars "docker_image=lanaradmilovic/taskservice:$(tag)"
+        ansible-playbook -i ansible/ansible_hosts ansible/01-playbook.yml --extra-vars "docker_image_tag=$(tag)"
       displayName: 'Install Ansible and Run Playbook'
+
