@@ -13,7 +13,7 @@ variable "docker_image" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "my-resource-group"
+  name     = "resource-group"
   location = "West Europe"
 }
 
