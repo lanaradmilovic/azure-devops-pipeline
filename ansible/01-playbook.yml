@@ -1,6 +1,6 @@
 ---
 - name: Deploy Docker Container
-  hosts: all
+  hosts: devgit
   become: true
   vars:
     docker_image: "lanaradmilovic/taskservice:{{ docker_image }}"
