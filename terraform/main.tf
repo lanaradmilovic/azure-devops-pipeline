@@ -1,5 +1,11 @@
 provider "azurerm" {
   features {}
+  subscription_id = var.subscription_id
+}
+
+variable "subscription_id" {
+  description = "Azure Subscription ID"
+  default = "d593673b-0e4f-4d3b-96da-f863d69d9470"
 }
 
 variable "docker_image" {
