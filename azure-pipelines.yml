@@ -5,24 +5,25 @@ resources:
   - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+ # tag: '$(Build.BuildId)'
+  tag: '63'
 
 stages:
-  - stage: Build
-    displayName: Build image
-    jobs:  
-      - job: Build
-        displayName: Build
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          - task: Docker@2
-            inputs:
-              containerRegistry: 'azure-docker-hub-connection'
-              repository: 'lanaradmilovic/taskservice'
-              command: 'buildAndPush'
-              Dockerfile: '**/Dockerfile'
-              tags: '$(tag)'
+ # - stage: Build
+  #  displayName: Build image
+   # jobs:  
+    #  - job: Build
+     #   displayName: Build
+      #  pool:
+       #   vmImage: 'ubuntu-latest'
+        #steps:
+         # - task: Docker@2
+          #  inputs:
+           #   containerRegistry: 'azure-docker-hub-connection'
+            #  repository: 'lanaradmilovic/taskservice'
+             # command: 'buildAndPush'
+              #Dockerfile: '**/Dockerfile'
+              #tags: '$(tag)'
 
   - stage: Terraform
     displayName: Terraform Apply
