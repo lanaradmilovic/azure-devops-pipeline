@@ -1,5 +1,5 @@
 trigger:
-- master
+- main
 
 resources:
 - repo: self
@@ -43,6 +43,12 @@ stages:
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
         environmentServiceNameAzureRM: 'azure-resources-connection'
         backendServiceArm: 'azure-resources-connection'
+        ensureBackend: true
+        backendAzureRmResourceGroupName: 'tf-backend-rg'
+        backendAzureRmResourceGroupLocation: 'westeurope'
+        backendAzureRmStorageAccountName: 'storageacctaskservice'
+        backendAzureRmContainerName: 'storageacctaskservice'
+        backendAzureRmKey: 'task-service-dev.tfstate'
 
     - task: TerraformTaskV2@0
       inputs:
