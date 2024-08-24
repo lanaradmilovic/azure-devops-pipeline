@@ -1,74 +1,73 @@
 trigger:
-- main
+  - main
 
 resources:
-- repo: self
+  - repo: self
 
 variables:
   tag: '$(Build.BuildId)'
 
 stages:
-- stage: Build
-  displayName: Build image
-  jobs:  
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'azure-service-connection'
-        repository: 'lanaradmilovic/taskservice'
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        tags: '$(tag)'
+  - stage: Build
+    displayName: Build image
+    jobs:  
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'azure-docker-hub-connection'
+              repository: 'lanaradmilovic/taskservice'
+              command: 'buildAndPush'
+              Dockerfile: '**/Dockerfile'
+              tags: '$(tag)'
 
-- stage: Terraform
-  displayName: Terraform Apply
-  jobs:
-  - job: Terraform
-    displayName: Apply Terraform
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
-      inputs:
-        terraformVersion: 'latest'
+  - stage: Terraform
+    displayName: Terraform Apply
+    jobs:
+      - job: Terraform
+        displayName: Apply Terraform
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+            inputs:
+              terraformVersion: 'latest'
 
-    - task: TerraformTaskV2@0
-      inputs:
-        provider: 'azurerm'
-        command: 'init'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-        environmentServiceNameAzureRM: 'azure-resources-connection'
-        backendServiceArm: 'azure-resources-connection'
-        ensureBackend: true
-        backendAzureRmResourceGroupName: 'tf-backend-rg'
-        backendAzureRmResourceGroupLocation: 'westeurope'
-        backendAzureRmStorageAccountName: 'storageacctaskservice'
-        backendAzureRmContainerName: 'storageacctaskservice'
-        backendAzureRmKey: 'task-service-dev.tfstate'
+          - task: TerraformTaskV2@0
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
+              environmentServiceNameAzureRM: 'azure-resources-connection'
+              backendServiceArm: 'azure-resources-connection'
+              ensureBackend: true
+              backendAzureRmResourceGroupName: 'tf-backend-rg'
+              backendAzureRmResourceGroupLocation: 'westeurope'
+              backendAzureRmStorageAccountName: 'storageacctaskservice'
+              backendAzureRmContainerName: 'storageacctaskservice'
+              backendAzureRmKey: 'task-service-dev.tfstate'
 
-    - task: TerraformTaskV2@0
-      inputs:
-        provider: 'azurerm'
-        command: 'apply'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
-        environmentServiceNameAzureRM: 'azure-resources-connection'
-        backendServiceArm: 'azure-resources-connection'
-        vars: |
-          docker_image=lanaradmilovic/taskservice:$(tag)
+          - task: TerraformTaskV2@0
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
+              environmentServiceNameAzureRM: 'azure-resources-connection'
+              backendServiceArm: 'azure-resources-connection'
+              commandOptions: '-var docker_image=lanaradmilovic/taskservice:$(tag)'
 
-- stage: Ansible
-  displayName: Ansible Playbook Execution
-  jobs:
-  - job: Ansible
-    displayName: Run Ansible Playbook
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - script: |
-        pip install ansible
-        ansible-playbook -i ansible/ansible_hosts ansible/01-playbook.yml --extra-vars "docker_image=lanaradmilovic/taskservice:$(tag)"
-      displayName: 'Install Ansible and Run Playbook'
+  - stage: Ansible
+    displayName: Ansible Playbook Execution
+    jobs:
+      - job: Ansible
+        displayName: Run Ansible Playbook
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              pip install ansible
+              ansible-playbook -i ansible/ansible_hosts ansible/01-playbook.yml --extra-vars "docker_image_tag=$(tag)"
+            displayName: 'Install Ansible and Run Playbook'
