@@ -21,4 +21,4 @@ stages:
         containerRegistry: 'azure-docker-hub-connection'
         repository: 'lanaradmilovic'
         command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
+        Dockerfile: '**/taskservice/Dockerfile'
